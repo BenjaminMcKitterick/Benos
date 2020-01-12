@@ -12,3 +12,9 @@ The following command can be used to emulate benos using qemu. Xorriso needs to 
 qemu-system-i386 -cdrom benos.iso
 
 useful resource - http://www.osdever.net/bkerndev/Docs/isrs.htm
+
+To commit to git hub use the following commands:
+    $ - git add *
+    $ - git commit -m "message here"
+    $ - git remote add origin git@github.com:BenjaminMcKitterick/Benos.git
+    $ - git push -u origin master
