@@ -7,6 +7,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
+static void timer();
 uint8_t ticks;
 uint8_t seconds;
 
@@ -23,6 +24,9 @@ static void timer()
   if(ticks % 100 == 0){
     seconds++;
   }
+  //move_entry(20,20);
+  //clear_terminal();
+  //print(base_conversion(ticks, 10), GREEN, BLACK);
 }
 /*
    The divisor is calculated and then split into the MSB
@@ -44,12 +48,15 @@ void set_frequency(uint8_t freq){
 void timer_wait(int tick_amount)
 {
     //uint32_t t_end = ticks + t;
-    unsigned long eticks;
+    unsigned int t_start;
 
-    eticks = ticks + tick_amount;
+    t_start = seconds + tick_amount;
     //println("%d",eticks);
-    while(ticks < eticks){
-      //println(" %d %d", seconds, eticks);
-    }
-    return 0;
+
+    // deadlock from there
+    while(seconds < t_start);
+  //  {
+      //print(base_conversion(seconds, 10), MAGENTA, BLACK);
+      //print(base_conversion(eticks, 10), MAGENTA, BLACK);
+  //  }
 }

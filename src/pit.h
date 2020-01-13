@@ -10,6 +10,5 @@
 void install_timer();
 void set_frequency(uint8_t freq);
 void timer_wait(int tick_amount);
-static void timer();
 
 #endif

@@ -1,14 +1,18 @@
 
 #include "interrupts.h"
 #include "display.h"
+#include "utility.h"
+#include "keyboard.h"
 
 #include <stddef.h>
 #include <stdint.h>
 
+static void double_fault(struct reg_state r);
+void create_handler(struct reg_state r);
 struct reg_state reg_state;
 isr int_handlers[256];
 
-unsigned char* exceptions[] = {
+const char* exceptions[] = {
   "Division By Zero",
   "Debug",
   "Non Maskable Interrupt",
@@ -30,6 +34,10 @@ unsigned char* exceptions[] = {
   "Machine Check"
 };
 
+void install_ISRs(){
+  reg_int_handler(8, &double_fault);
+}
+
 /*
    Function to register interrupt handlers.
 */
@@ -37,7 +45,6 @@ void reg_int_handler(uint8_t n, isr handler)
 {
     int_handlers[n] = handler;
 }
-
 /*
    Interrupt service routine handler. creates a handler
    for the isr and displays some information about the
@@ -48,15 +55,13 @@ void isr_handler(struct reg_state r)
   create_handler(r);
 
   println("");
-  if (r.int_num >= 19 & r.int_num <= 31){
+  if ((r.int_num >= 19) & (r.int_num <= 31)){
     println("Interrupt: %h, Reserved Exception", r.int_num);
   } else if (r.int_num < 19){
     println("Interrupt: %h, %s Exception", r.int_num, exceptions[r.int_num]);
   }
-  //move_entry(0, get_cursor_y());
   update_keyboard();
 }
-
 /*
    Interrupt request handler. Creates a handler for the irq,
    then tells the correct PIC that the interrupt has ended. If
@@ -72,7 +77,6 @@ void irq_handler(struct reg_state r)
 
 	port_out(MASTER_PIC, END_OF_INTERRUPT);
 }
-
 /*
    This function uses the typedef isr defined in the header file
    as a function pointer to a handler. Each isr is indexed via its
@@ -87,13 +91,8 @@ void create_handler(struct reg_state r)
   }
 }
 
-void install_ISRs(){
-  reg_int_handler(8, &double_fault);
-}
-
 static void double_fault(struct reg_state r){
     set_cursor_x(0);
-
     println("");
     println("   Register state:");
     println("   Eflags %h %h %h %h %h %h %h %h", r.edi, r.esi,

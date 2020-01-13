@@ -26,17 +26,15 @@
 #define IRQ14 46
 #define IRQ15 47
 
-typedef struct reg_state
+struct reg_state
 {
 	unsigned int edi, esi, ebp, esp, ebx, edx, ecx, eax;
 	unsigned int offset, int_num, error_code;
 	unsigned int eip, cs, eflags, useresp, ss;
 } __attribute__ ((aligned(4)));
 
-typedef void (*isr)(reg_state);
-void reg_int_handler(uint8_t n, isr handler);
 void install_ISRs();
-
-static void double_fault(struct reg_state r);
+typedef void (*isr)(struct reg_state);
+void reg_int_handler(uint8_t n, isr handler);
 
 #endif

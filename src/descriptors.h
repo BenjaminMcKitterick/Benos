@@ -5,8 +5,8 @@
 #include <stddef.h>
 
 void intitialise_tables();
-void gdt_init();
-void idt_init();
+void load_gdt();
+void load_idt();
 void gdt_setup(uint32_t index, uint32_t base, uint32_t limit, uint8_t access, uint8_t gran);
 void idt_setup(uint8_t index, uint32_t base, uint16_t selector, uint8_t type);
 

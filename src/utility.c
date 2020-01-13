@@ -33,16 +33,16 @@ void *set_memory(void *address, char data, size_t num_bytes)
 	return address;
 }
 /* TODO: finish the memory allocation function. */
-void *allocate_memory(uint32_t size, uint8_t align)
-{
-		void *memory_pointer;
-}
+//void *allocate_memory(uint32_t size, uint8_t align)
+//{
+		//void *memory_pointer;
+//}
 
 /* TODO: finish the free memory function. */
-void free_memory(void *memory_pointer)
-{
+//void free_memory(void *memory_pointer)
+//{
 
-}
+//}
 
 /*
 	 Simple funtion that returns the length of a string by counting

@@ -2,6 +2,8 @@
 #include "paging.h"
 #include "interrupts.h"
 
+static void page_fault();
+
 void initialise_paging()
 {
     //enable_paging();

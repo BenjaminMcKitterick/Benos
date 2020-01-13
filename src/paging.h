@@ -3,7 +3,6 @@
 #define PAGING_H
 
 void initialise_paging();
-static void page_fault();
 extern void enable_paging();
 
 typedef struct page

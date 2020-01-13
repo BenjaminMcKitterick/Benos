@@ -62,11 +62,11 @@ void move_entry(size_t x,  size_t y)
 
 int get_cursor_x(){	return cursor_x; }
 int get_cursor_y(){ return cursor_y; }
-int set_cursor_x(int x){ cursor_x = x; }
+void set_cursor_x(int x){ cursor_x = x; }
 
 void clear_terminal()
 {
-    for(int i = 0; i < TERMINAL_WIDTH*TERMINAL_HEIGHT; i++){
+    for(int i = 0; i < (int)(TERMINAL_WIDTH*TERMINAL_HEIGHT); i++){
         vga_buf[i] = 0x20 | 0 << 8;
     }
 }
@@ -74,11 +74,11 @@ void clear_terminal()
 void scroll_terminal()
 {
 		// move the text chunk up
-		for(int i = 0*TERMINAL_WIDTH; i < (TERMINAL_HEIGHT-1)*TERMINAL_WIDTH; i++){
+		for(int i = 0*TERMINAL_WIDTH; i < (int)((TERMINAL_HEIGHT-1)*TERMINAL_WIDTH); i++){
 				vga_buf[i] = vga_buf[i+TERMINAL_WIDTH];
 		}
 		// clear bottom line
-		for(int i = (TERMINAL_HEIGHT-1)*TERMINAL_WIDTH; i < TERMINAL_HEIGHT*TERMINAL_WIDTH; i++){
+		for(int i = (TERMINAL_HEIGHT-1)*TERMINAL_WIDTH; i < (int)(TERMINAL_HEIGHT*TERMINAL_WIDTH); i++){
 				vga_buf[i] = 0x20 | 0 << 8;
 		}
 		cursor_y = TERMINAL_HEIGHT-1;
@@ -94,7 +94,7 @@ void println(char* fstring, ...)
   while(*fstring != 0)
   {
       if(*fstring == '%'){
-          *fstring++;
+          fstring++;
           switch(*fstring)
           {
               case 'd':
@@ -119,7 +119,7 @@ void println(char* fstring, ...)
       } else {
           putchar(*fstring, GREEN, BLACK);
       }
-      *fstring++;
+      fstring++;
   }
   va_end(arg);
 	move_entry(get_cursor_x(), get_cursor_y()+1);

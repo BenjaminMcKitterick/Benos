@@ -4,6 +4,8 @@
 #include "utility.h"
 #include "display.h"
 
+static void keyboard_input();
+void key_enter();
 int entry_x = ENTRY_START;
 int entry_y;
 
@@ -63,7 +65,7 @@ void update_keyboard(){
 
 static void keyboard_input()
 {
-    char scancode = port_in(0x60);
+    unsigned char scancode = port_in(0x60);
     char clear = (0x20 | 0 << 8);
 
     move_entry(entry_x, entry_y);
@@ -73,8 +75,6 @@ static void keyboard_input()
         // handle shift keys and tings...
     } else {
       switch(key){
-        case 'c':
-          asm volatile ("int $0x07");
         case '\n':
           key_enter();
           break;
@@ -94,13 +94,13 @@ static void keyboard_input()
 }
 
 void key_enter(){
-    if(entry_x > TERMINAL_WIDTH-ENTRY_START){
+    if(entry_x > (int)(TERMINAL_WIDTH-ENTRY_START)){
       int line = (int)(entry_x/TERMINAL_WIDTH);
       entry_y += line + 1;
     }else {
       entry_y++;
     }
-    if (get_cursor_y() >= TERMINAL_HEIGHT-1){
+    if (get_cursor_y() >= (int)(TERMINAL_HEIGHT-1)){
         scroll_terminal();
         entry_y = TERMINAL_HEIGHT-1;
     }

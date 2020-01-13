@@ -37,12 +37,14 @@ enum vga_color {
 
 void print(const char* string, uint8_t fcol, uint8_t bcol);
 uint16_t vga_input(unsigned char chr, uint8_t fcolour, uint8_t bcolour);
-void moveEntry(size_t x,  size_t y);
+void move_entry(size_t x,  size_t y);
 void clear_terminal();
 void move_cursor(int x, int y);
 int get_cursor_y();
 int get_cursor_x();
+void set_cursor_x(int x);
 void scroll_terminal();
+void putchar(char chr, uint8_t fcol, uint8_t bcol);
 void println(char* fstring, ...);
 char *base_conversion(unsigned int decimal, int base);
 

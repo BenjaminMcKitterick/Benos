@@ -4,6 +4,7 @@
 
 #include "utility.h"
 #include "display.h"
+#include "interrupts.h"
 #include "descriptors.h"
 #include "keyboard.h"
 #include "paging.h"
@@ -25,7 +26,7 @@ void kernel_main(void)
 	pic_remap(0x20, 0x28);
 	asm volatile ("sti");
 
-	asm volatile ("int $0xD");
+	asm volatile ("int $0x8");
 
 	while(true){
 		//move_entry(0,0);

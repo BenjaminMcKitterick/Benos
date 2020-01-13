@@ -18,8 +18,8 @@
 void pic_remap(int master_offset, int slave_offset)
 {
 	// begin by saving the PIC masks
-	uint8_t master_mask = port_in(MASTER_DATA);
-	uint8_t slave_mask = port_in(SLAVE_DATA);
+	//uint8_t master_mask = port_in(MASTER_DATA);
+	//uint8_t slave_mask = port_in(SLAVE_DATA);
 
 	/* In protected mode start with initialisation sequence 0x11
 	   for master and slave PIC. */

@@ -16,6 +16,8 @@ struct gdt_pointer gdt_pointer;
 struct idt_pointer idt_pointer;
 
 extern isr int_handlers[];
+static void gdt_init();
+static void idt_init();
 
 /* Initialises both the gdt and idt tables */
 void intitialise_tables(){
@@ -27,7 +29,7 @@ void intitialise_tables(){
 
 }
 
-void gdt_init()
+static void gdt_init()
 {
 	/* Sets the gdt pointer to allow the processor to find it. */
 	gdt_pointer.limit = (sizeof(gdt) * GDT_NUM) - 1;
@@ -58,9 +60,9 @@ void gdt_setup(uint32_t index, uint32_t base, uint32_t limit, uint8_t access, ui
 	gdt[index].access = access;
 }
 
-void idt_init()
+static void idt_init()
 {
-	idt_pointer.limit = sizeof(idt) * INTVECT_NUM -1;
+	idt_pointer.limit = (uint16_t)(sizeof(idt) * INTVECT_NUM -1);
 	idt_pointer.base = (uint32_t)&idt;
 
 	/* set everything in idt to zeros */
