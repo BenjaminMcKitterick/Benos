@@ -20,6 +20,7 @@ all:
 		$$TARGET-gcc -c $(SRC_DIR)/utility.c -o $(OUT_DIR)/utility.o $(CFLAGS)
 		$$TARGET-gcc -c $(SRC_DIR)/interrupts.c -o $(OUT_DIR)/interrupts.o $(CFLAGS)
 		$$TARGET-gcc -c $(SRC_DIR)/keyboard.c -o $(OUT_DIR)/keyboard.o $(CFLAGS)
+		$$TARGET-gcc -c $(SRC_DIR)/paging.c -o $(OUT_DIR)/paging.o $(CFLAGS)
 		$$TARGET-gcc -c $(SRC_DIR)/pic.c -o $(OUT_DIR)/pic.o $(CFLAGS)
 		$$TARGET-gcc -c $(SRC_DIR)/pit.c -o $(OUT_DIR)/pit.o $(CFLAGS)
 		$$TARGET-gcc -c $(SRC_DIR)/flush.s -o $(OUT_DIR)/flush.o $(CFLAGS)
@@ -29,7 +30,7 @@ all:
 		$$TARGET-gcc -T $(SRC_DIR)/linker.ld -o benos.bin $(LFLAGS) $(OUT_DIR)/boot.o \
 			$(OUT_DIR)/kernel.o $(OUT_DIR)/display.o $(OUT_DIR)/descriptors.o $(OUT_DIR)/flush.o \
 			$(OUT_DIR)/utility.o $(OUT_DIR)/isr.o $(OUT_DIR)/interrupts.o $(OUT_DIR)/pic.o \
-			$(OUT_DIR)/pit.o $(OUT_DIR)/keyboard.o -lgcc
+			$(OUT_DIR)/pit.o $(OUT_DIR)/keyboard.o $(OUT_DIR)/paging.o -lgcc
 
 		# Build the bootable image
 		mkdir -p dir/boot/grub

@@ -25,12 +25,12 @@ load_idt:
 # need to set global tings and allow the external var to be parsed.
 # using 0x80000001 will set PG and PE bits in CR0 reg
 
-#.global enable_paging
-#.extern dir
-#enable_paging:
-#		mov (dir), %eax
-#		mov %eax, %cr3
-#		mov %cr0, %eax
-#		or $0x80000001, %eax
-#		mov %eax, %cr0
-#		ret
+.global enable_paging
+.extern dir_address
+enable_paging:
+		mov $dir_address, %eax
+		mov %eax, %cr3
+		mov %cr0, %eax
+		or $0x80000001, %eax
+		mov %eax, %cr0
+		ret

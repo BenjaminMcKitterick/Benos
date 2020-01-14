@@ -2,41 +2,46 @@
 #ifndef PAGING_H
 #define PAGING_H
 
+#define ENTRIES 1024
+
+void enable_paging();
 void initialise_paging();
-extern void enable_paging();
 
 typedef struct page
 {
-    uint32_t present        : 1;
-    uint32_t rw             : 1;
-    uint32_t user           : 1;
-    uint32_t wt             : 1;
-    uint32_t cache          : 1;
-    uint32_t access         : 1;
-    uint32_t dirty          : 1;
-    uint32_t global         : 1;
-    uint32_t reserved       : 4;
-    uint32_t frame          : 20;
+    uint32_t present        : 1;          // if 1 page in physical memory
+    uint32_t rw             : 1;          // page read/write
+    uint32_t user           : 1;          // priviledge level
+    uint32_t wt             : 1;          // wt cache enabled
+    uint32_t cache          : 1;          // if 1 then cache disabled
+    uint32_t access         : 1;          // if 1 page r | w to
+    uint32_t dirty          : 1;          // page has been written to
+    uint32_t global         : 1;          // if 1 prevents TLB updating address
+    uint32_t reserved       : 4;          // reserved bits
+    uint32_t address        : 20;         // physical page address
 } page_t;
 
 typedef struct page_table
 {
-    page_t table_entries[1024];
+    page_t *entry[ENTRIES];
 } page_table_t __attribute__((aligned(4096)));
 
-/*
-   This page_dir struct consists of an array (*p_tables) to
-   hold pointers to the page tables. physical_tables is another
-   array of pointers for the physical address of the page tables
-   for loding the CR3 register.
-
-   note: very important that this address be 4-KiB aligned.
-*/
-typedef struct page_dir
+typedef struct page_dir_entry
 {
-    page_table_t *p_tables[1024];
-    uint32_t physical_tables[1024];
-    uint32_t physical_address;
-} page_dir_t __attribute__((aligned(4096)));
+    uint32_t present          : 1;      // if 1 page is in physical memory
+    uint32_t rw               : 1;      // if 1 rw
+    uint32_t user             : 1;      // priviledge level
+    uint32_t wt               : 1;      // if 1 wt cache enabled
+    uint32_t cache            : 1;      // if 1 cache disabled
+    uint32_t access           : 1;      // has been read or written to
+    uint32_t page_size        : 1;      // 0 for 4kb
+    uint32_t Reserved         : 5;      // reserved bits
+    uint32_t table_address    : 20;     // page table address
+} page_dir_entry_t;
+
+typedef struct page_directory
+{
+    page_dir_entry_t *entry[ENTRIES];
+} page_directory_t __attribute__((aligned(4096)));
 
 #endif

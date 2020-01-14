@@ -17,7 +17,7 @@ void kernel_main(void)
 	install_ISRs();
 	install_timer();
 	install_keyboard();
-	//initialise_paging();
+	initialise_paging();
 
 	/* After the exceptions have been registered we can re-map
 	   the PIC and set the interrupt flag (sti) to allow IRQs
