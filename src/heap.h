@@ -9,6 +9,9 @@
 #define HEAP_INITIAL_SIZE   0x100000
 #define HEAP_MAGIC          0x0DECAF
 #define HEAP_MAX            0xBFFFF000
+#define HEAP_MIN            0x50000
+#define PAGE_SIZE           0x1000
+#define ALIGNMENT           0xFFFFF000
 #define HEAP_END (HEAP_START + HEAP_INITIAL_SIZE)
 
 typedef struct

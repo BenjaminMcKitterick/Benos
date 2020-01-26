@@ -20,5 +20,6 @@ uint8_t lessthan(form_t a, form_t b);
 //meta_table_t create_table(uint32_t max_size, order_t less_than);
 meta_table_t initialise_table(void *address, uint32_t max_size, order_t less_than);
 void insert(form_t block, meta_table_t *table);
+form_t search(uint32_t n, meta_table_t *table);
 
 #endif

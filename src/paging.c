@@ -39,18 +39,31 @@ void initialise_paging()
     /* put the page table in the directory */
 
     *dir_entry = (page_dir_entry_t) { .rw = 1,
-       .user = 1, .table_address = &page_table};
+       .user = 1, .table_address = (uint32_t)&page_table};
 
     page_directory->entry[0] = dir_entry;
     dir_address = page_directory->entry[0]->table_address;
     page_address = page_table->entry[0]->address;
-    /* enable paging using asm function */
 
+    /* enable paging using asm function */
     //enable_paging();
     reg_int_handler(14, &page_fault);
 
     // create heap structure
     heap = create_heap(HEAP_START, HEAP_END, HEAP_MAX);
+
+    println(" HEAP INTIALISED ");
+    println(" %h", heap->start_address);
+    println(" %h", heap->end_address);
+    println(" %h", heap->max_address);
+
+    uint32_t curr_size = heap->start_address - heap->end_address;
+    alter_heap_size(curr_size - (PAGE_SIZE * 9), heap);
+
+    println(" HEAP ALTERED ");
+    println(" %h", heap->start_address);
+    println(" %h", heap->end_address);
+    println(" %h", heap->max_address);
 }
 
 static void page_fault()

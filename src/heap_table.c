@@ -35,7 +35,7 @@ void insert(form_t block, meta_table_t *table)
     for(int i = 0; table->size && table->order(table->pointer[i], block); i++)
     {
          i++;
-         if(i == table->size)
+         if(i == (int)table->size)
          {
              // add item to the end
              table->pointer[table->size++] = block;
@@ -45,7 +45,7 @@ void insert(form_t block, meta_table_t *table)
              form_t temp = table->pointer[i];
              table->pointer[i] = block;
              // now shift everything along once
-             while( i < table->size )
+             while( i < (int)table->size )
              {
                i++;
                form_t temp2 = table->pointer[i];
@@ -55,4 +55,16 @@ void insert(form_t block, meta_table_t *table)
              table->size++;
          }
      }
+}
+
+form_t search(uint32_t n, meta_table_t *table)
+{
+    if( n < table->size)
+    {
+      return table->pointer[n];
+    } else
+    {
+      println(" ERROR - NO HEAP DATA AT INDEX %d", n);
+      return 0;
+    }
 }
