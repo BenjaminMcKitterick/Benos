@@ -28,7 +28,8 @@ const char* exceptions[] = {
   "Stack Fault",
   "General Protection Fault",
   "Page Fault",
-  "Unknown Interrupt",
+  //"Unknown Interrupt",
+  "Fail for You!",
   "Coprocessor Fault",
   "Alignment Check",
   "Machine Check"

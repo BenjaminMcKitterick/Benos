@@ -3,35 +3,34 @@
    a kernel image. */
 
 ENTRY(load)
- 
+
 SECTIONS
 {
 	/* Put sections at 1 MiB. */
 	. = 1M;
- 
-	/* text section. */
-	.text BLOCK(4K) : ALIGN(4K)
+
+	/* code section. */
+	.text 0x100000 : ALIGN(4K)
 	{
+    text = .; _text = .; __text = .;
 		*(.multiboot)
 		*(.text)
 	}
- 
-	/* Read-only data section. */
-	.rodata BLOCK(4K) : ALIGN(4K)
-	{
-		*(.rodata)
-	}
- 
+
 	/* Read-write data section. */
 	.data BLOCK(4K) : ALIGN(4K)
 	{
+    data = .; _data = .; __data = .;
 		*(.data)
 	}
- 
+
 	/* Read-write data and stack bss section */
 	.bss BLOCK(4K) : ALIGN(4K)
 	{
+    bss = .; _bss = .; __bss = .;
 		*(COMMON)
 		*(.bss)
 	}
+
+  end = .; _end = .; __end = .;
 }

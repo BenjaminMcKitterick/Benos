@@ -53,6 +53,8 @@ void timer_wait(int tick_amount)
     t_start = seconds + tick_amount;
     //println("%d",eticks);
 
+    // event queue on timer interrupt
+
     // deadlock from there
     while(seconds < t_start);
   //  {

@@ -10,6 +10,7 @@
 #include "paging.h"
 #include "pic.h"
 #include "pit.h"
+#include "heap.h"
 
 void kernel_main(void)
 {
