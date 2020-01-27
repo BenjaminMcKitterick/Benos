@@ -44,7 +44,7 @@ void initialise_paging()
 
     page_directory->entry[0] = dir_entry;
     dir_address = page_directory->entry[0]->table_address;
-    page_address = page_table->entry[0]->address;
+    page_address = page_table->entry[0]->frame;
 
     /* enable paging using asm function */
     //enable_paging();

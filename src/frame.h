@@ -3,5 +3,7 @@
 #define FRAME_H
 
 #define BITMAP_SIZE 32
+#define PAGE_END_ADDRESS 0x10000000
+#define NUM_FRAMES (PAGE_END_ADDRESS / PAGE_SIZE)
 
 #endif

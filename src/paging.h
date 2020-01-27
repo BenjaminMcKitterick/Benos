@@ -18,7 +18,7 @@ typedef struct page
     uint32_t dirty          : 1;          // page has been written to
     uint32_t global         : 1;          // if 1 prevents TLB updating address
     uint32_t reserved       : 4;          // reserved bits
-    uint32_t address        : 20;         // physical page address
+    uint32_t frame          : 20;         // frame address
 } page_t;
 
 typedef struct page_table

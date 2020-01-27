@@ -47,5 +47,6 @@ void scroll_terminal();
 void putchar(char chr, uint8_t fcol, uint8_t bcol);
 void println(char* fstring, ...);
 char *base_conversion(unsigned int decimal, int base);
+void print_error(char* string);
 
 #endif

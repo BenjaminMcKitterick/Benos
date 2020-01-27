@@ -84,6 +84,12 @@ void scroll_terminal()
 		cursor_y = TERMINAL_HEIGHT-1;
 }
 
+void print_error(char* string)
+{
+	print(string, RED, BLACK);
+	move_entry(get_cursor_x(), get_cursor_y()+1);
+}
+
 void println(char* fstring, ...)
 {
   va_list arg;
