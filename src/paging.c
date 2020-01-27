@@ -9,6 +9,7 @@
 
 static void page_fault();
 extern heap_t *heap;
+extern uint32_t p_address;
 uint32_t dir_address;
 uint32_t page_address;
 page_directory_t page_directory[ENTRIES];
@@ -51,19 +52,12 @@ void initialise_paging()
 
     // create heap structure
     heap = create_heap(HEAP_START, HEAP_END, HEAP_MAX);
-
+    /*
     println(" HEAP INTIALISED ");
     println(" %h", heap->start_address);
     println(" %h", heap->end_address);
     println(" %h", heap->max_address);
-
-    uint32_t curr_size = heap->start_address - heap->end_address;
-    alter_heap_size(curr_size - (PAGE_SIZE * 9), heap);
-
-    println(" HEAP ALTERED ");
-    println(" %h", heap->start_address);
-    println(" %h", heap->end_address);
-    println(" %h", heap->max_address);
+    */
 }
 
 static void page_fault()

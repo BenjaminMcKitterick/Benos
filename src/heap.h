@@ -3,6 +3,7 @@
 #define HEAP_H
 
 #include "heap_table.h"
+#include <stddef.h>
 
 #define HEAP_START          0xB0000000
 #define HEAP_INDEX_SIZE     0x20000
@@ -36,6 +37,7 @@ typedef struct
 } heap_t;
 
 heap_t *create_heap(uint32_t start, uint32_t end, uint32_t max);
-uint32_t alloc_memory(size_t size, uint8_t align);
+uint32_t alloc_virtual(size_t size, uint8_t align);
+uint32_t alloc_physical(size_t size, uint8_t align, uint32_t *physical);
 
 #endif

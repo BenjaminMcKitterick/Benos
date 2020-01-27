@@ -23,6 +23,7 @@ all:
 		$$TARGET-gcc -c $(SRC_DIR)/paging.c -o $(OUT_DIR)/paging.o $(CFLAGS)
 		$$TARGET-gcc -c $(SRC_DIR)/heap_table.c -o $(OUT_DIR)/heap_table.o $(CFLAGS)
 		$$TARGET-gcc -c $(SRC_DIR)/heap.c -o $(OUT_DIR)/heap.o $(CFLAGS)
+		$$TARGET-gcc -c $(SRC_DIR)/frame.c -o $(OUT_DIR)/frame.o $(CFLAGS)
 		$$TARGET-gcc -c $(SRC_DIR)/pic.c -o $(OUT_DIR)/pic.o $(CFLAGS)
 		$$TARGET-gcc -c $(SRC_DIR)/pit.c -o $(OUT_DIR)/pit.o $(CFLAGS)
 		$$TARGET-gcc -c $(SRC_DIR)/flush.s -o $(OUT_DIR)/flush.o $(CFLAGS)
@@ -33,7 +34,7 @@ all:
 			$(OUT_DIR)/kernel.o $(OUT_DIR)/display.o $(OUT_DIR)/descriptors.o $(OUT_DIR)/flush.o \
 			$(OUT_DIR)/utility.o $(OUT_DIR)/isr.o $(OUT_DIR)/interrupts.o $(OUT_DIR)/pic.o \
 			$(OUT_DIR)/pit.o $(OUT_DIR)/keyboard.o $(OUT_DIR)/paging.o $(OUT_DIR)/heap.o \
-            $(OUT_DIR)/heap_table.o -lgcc
+            $(OUT_DIR)/heap_table.o $(OUT_DIR)/frame.o -lgcc
 
 		# Build the bootable image
 		mkdir -p dir/boot/grub
