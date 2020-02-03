@@ -8,11 +8,10 @@ extern uint32_t end;
 uint32_t p_address = (uint32_t)&end;
 heap_t *heap=0;
 
-static uint32_t page_align(uint32_t address)
+static void page_align()
 {
-  address &= ALIGNMENT;
-  address += PAGE_SIZE;
-  return address;
+    p_address &= ALIGNMENT;
+    p_address += PAGE_SIZE;
 }
 
 // Function to sort headers by size
@@ -21,7 +20,7 @@ static uint8_t header_order(void*a, void *b)
     return (((meta_header_t*)a)->size < ((meta_header_t*)b)->size)?1:0;
 }
 
-uint32_t alloc_virtual(size_t size, uint8_t align)
+uint32_t malloc_virt(size_t size, uint8_t align)
 {
   if (heap != 0)
   {
@@ -30,9 +29,8 @@ uint32_t alloc_virtual(size_t size, uint8_t align)
   else
   {
     if( align == 1 && (p_address & ALIGNMENT))
-    {
-      p_address = page_align((uint32_t)&p_address);
-    }
+        page_align();
+
     uint32_t mem = p_address;
     p_address += size;
     return mem;
@@ -40,7 +38,7 @@ uint32_t alloc_virtual(size_t size, uint8_t align)
   return 0;
 }
 
-uint32_t alloc_physical(size_t size, uint8_t align, uint32_t *physical)
+uint32_t malloc_phys(size_t size, uint8_t align, uint32_t *physical)
 {
   if (heap != 0)
   {
@@ -48,10 +46,8 @@ uint32_t alloc_physical(size_t size, uint8_t align, uint32_t *physical)
   } else
   {
     if( align == 1 && (p_address & ALIGNMENT))
-    {
-      p_address = page_align((uint32_t)&p_address);
-    }
-    // allocate physical memory address
+        page_align();
+
     *physical = p_address;
     uint32_t mem = p_address;
     p_address += size;
@@ -62,7 +58,7 @@ uint32_t alloc_physical(size_t size, uint8_t align, uint32_t *physical)
 
 heap_t *create_heap(uint32_t start, uint32_t end, uint32_t max)
 {
-    heap_t *heap = (heap_t*)alloc_virtual(sizeof(heap_t), 0);
+    heap_t *heap = (heap_t*)malloc_virt(sizeof(heap_t), 0);
     meta_table_t heap_table = initialise_table((void*)start, HEAP_INDEX_SIZE, &header_order);
 
     start += sizeof(form_t)*HEAP_INDEX_SIZE;
@@ -81,6 +77,7 @@ heap_t *create_heap(uint32_t start, uint32_t end, uint32_t max)
 
     return heap;
 }
+
 // function that finds smallest hole
 uint32_t smallest_hole(uint32_t size, uint8_t page_aligned, heap_t *heap)
 {
@@ -119,7 +116,7 @@ void alter_heap_size(uint32_t new_size, heap_t *heap)
 
   if ((new_size & ALIGNMENT) != 0)
   {
-    new_size = page_align(new_size);
+    // TODO: new_size = page_align(new_size);
   }
 
   if( new_size > current_size )

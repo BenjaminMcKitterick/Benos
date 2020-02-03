@@ -4,6 +4,9 @@
 
 #define ENTRIES 1024
 
+#include <stddef.h>
+#include <stdint.h>
+
 void enable_paging();
 void initialise_paging();
 
@@ -23,25 +26,16 @@ typedef struct page
 
 typedef struct page_table
 {
-    page_t *entry[ENTRIES];
+    page_t pages[ENTRIES];
 } page_table_t __attribute__((aligned(4096)));
-
-typedef struct page_dir_entry
-{
-    uint32_t present          : 1;         // if 1 page is in physical memory
-    uint32_t rw               : 1;         // if 1 rw
-    uint32_t user             : 1;         // priviledge level
-    uint32_t wt               : 1;         // if 1 wt cache enabled
-    uint32_t cache            : 1;         // if 1 cache disabled
-    uint32_t access           : 1;         // has been read or written to
-    uint32_t page_size        : 1;         // 0 for 4kb
-    uint32_t Reserved         : 5;         // reserved bits
-    uint32_t table_address    : 20;        // page table address
-} page_dir_entry_t;
 
 typedef struct page_directory
 {
-    page_dir_entry_t *entry[ENTRIES];
+    page_table_t *entry[ENTRIES];
+    uint32_t physical_tables[ENTRIES];
 } page_directory_t __attribute__((aligned(4096)));
+
+page_t *retrieve_page(uint32_t address, page_directory_t *dir);
+void load_directory(page_directory_t *directory);
 
 #endif

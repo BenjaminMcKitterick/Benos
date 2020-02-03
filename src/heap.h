@@ -5,6 +5,13 @@
 #include "heap_table.h"
 #include <stddef.h>
 
+uint32_t kmalloc_int(uint32_t sz, int align, uint32_t *phys);
+uint32_t kmalloc_a(uint32_t sz);
+uint32_t kmalloc_p(uint32_t sz, uint32_t *phys);
+uint32_t kmalloc_ap(uint32_t sz, uint32_t *phys);
+uint32_t kmalloc(uint32_t sz);
+
+
 #define HEAP_START          0xB0000000
 #define HEAP_INDEX_SIZE     0x20000
 #define HEAP_INITIAL_SIZE   0x100000
@@ -37,7 +44,8 @@ typedef struct
 } heap_t;
 
 heap_t *create_heap(uint32_t start, uint32_t end, uint32_t max);
-uint32_t alloc_virtual(size_t size, uint8_t align);
-uint32_t alloc_physical(size_t size, uint8_t align, uint32_t *physical);
+uint32_t malloc_virt(size_t size, uint8_t align);
+uint32_t malloc_phys(size_t size, uint8_t align, uint32_t *physical);
+uint32_t kmalloc_int(uint32_t sz, int align, uint32_t *phys);
 
 #endif

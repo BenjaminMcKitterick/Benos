@@ -88,6 +88,9 @@ void print_error(char* string)
 {
 	print(string, RED, BLACK);
 	move_entry(get_cursor_x(), get_cursor_y()+1);
+	while(1){
+		// when error triggered we stick in loop
+	}
 }
 
 void println(char* fstring, ...)

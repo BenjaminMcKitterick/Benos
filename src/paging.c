@@ -1,66 +1,71 @@
 
+#include "paging.h"
+#include "heap.h"
+#include "display.h"
+#include "interrupts.h"
+#include "utility.h"
+#include "frame.h"
+
 #include <stddef.h>
 #include <stdint.h>
 
-#include "paging.h"
-#include "display.h"
-#include "interrupts.h"
-#include "heap.h"
-
+page_directory_t *directory=0;
 static void page_fault();
-extern heap_t *heap;
 extern uint32_t p_address;
-uint32_t dir_address;
-uint32_t page_address;
-page_directory_t page_directory[ENTRIES];
-page_table_t page_table[ENTRIES];
-page_dir_entry_t dir_entry[ENTRIES];
-page_t page[ENTRIES];
 
 void initialise_paging()
 {
-    /* create a blank page directory and set each entry to
-       not present so that if the MMU looks for that page table,
-       it will see that it is not there. */
+    // Initialise memory for frames and directory
+    frames = (uint32_t*)malloc_virt((NUM_FRAMES/BITMAP_SIZE), 0);
+    directory = (page_directory_t*)malloc_virt(sizeof(page_directory_t), 1);
+    set_memory(frames, 0, (NUM_FRAMES/BITMAP_SIZE));
+    set_memory(directory, 0, sizeof(page_directory_t));
 
-    *dir_entry = (page_dir_entry_t) { .rw = 1, .user = 1};
-
-    for(int i = 0; i < ENTRIES; i++){
-      page_directory->entry[i] = dir_entry;
+    int i = 0;
+    page_t *new_page;
+    // Assign frames to pages
+    while ((uint32_t)i < p_address)
+    {
+        new_page = retrieve_page(i, directory);
+        allocate_frame(new_page);
+        i += PAGE_SIZE;
     }
 
-    /* create a start default page table and set default pages */
-
-    *page = (page_t) { .present = 1, .user = 1, .rw = 1};
-
-    for(int i = 0; i < ENTRIES; i++){
-        page_table->entry[i] = page;
-    }
-
-    /* put the page table in the directory */
-
-    *dir_entry = (page_dir_entry_t) { .rw = 1,
-       .user = 1, .table_address = (uint32_t)&page_table};
-
-    page_directory->entry[0] = dir_entry;
-    dir_address = page_directory->entry[0]->table_address;
-    page_address = page_table->entry[0]->frame;
-
-    /* enable paging using asm function */
-    //enable_paging();
+    // Register the page fault handler then load the directory
     reg_int_handler(14, &page_fault);
-
-    // create heap structure
-    heap = create_heap(HEAP_START, HEAP_END, HEAP_MAX);
-    /*
-    println(" HEAP INTIALISED ");
-    println(" %h", heap->start_address);
-    println(" %h", heap->end_address);
-    println(" %h", heap->max_address);
-    */
+    load_directory(directory);
 }
 
-static void page_fault()
+void load_directory(page_directory_t *directory)
 {
-    println("page fault triggered");
+    asm volatile("mov %0, %%cr3":: "r"(&directory->physical_tables));
+    enable_paging();
+}
+
+page_t *retrieve_page(uint32_t address, page_directory_t *directory)
+{
+    uint32_t table_index = (address/=PAGE_SIZE)/ENTRIES;
+    page_table_t *page_table = directory->entry[table_index];
+    if (directory->entry[table_index])
+    {
+        // if already exists then return the page
+        return &page_table->pages[address%ENTRIES];
+    }
+    else
+    {
+        uint32_t temp_addr;
+        set_memory(page_table, 0, PAGE_SIZE);
+        directory->entry[table_index] = (page_table_t*)malloc_phys(sizeof(page_table_t), 1, &temp_addr);
+        directory->physical_tables[table_index] = temp_addr | 0x3;
+        return &directory->entry[table_index]->pages[address%PAGE_SIZE];
+    }
+}
+
+static void page_fault(struct reg_state r)
+{
+    uint32_t fault_address;
+    asm volatile("mov %%cr2, %0" : "=r" (fault_address));
+    println(" Interrupt: %h Page Fault Exception", r.int_num);
+    println(" Error %h at %h", r.offset, fault_address);
+    print_error(" Stopping...");
 }

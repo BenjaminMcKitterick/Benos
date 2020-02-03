@@ -8,9 +8,7 @@
 
 extern uint32_t p_address;
 
-uint32_t *frames;
-
-void set_frame_bit(uint32_t address, uint8_t bit)
+static void set_frame_bit(uint32_t address, uint8_t bit)
 {
   uint32_t frame_num = address/PAGE_SIZE;
   uint32_t i = frame_num/BITMAP_SIZE;
@@ -26,7 +24,7 @@ void set_frame_bit(uint32_t address, uint8_t bit)
 }
 
 // finds the first free frame within a bitmap
-uint32_t find_free_frame()
+static uint32_t find_free_frame()
 {
     for(int i = 0; i < (int)(NUM_FRAMES/BITMAP_SIZE); i++)
     {
@@ -45,19 +43,16 @@ void allocate_frame(page_t *page)
     if(page->frame)
     {
       print_error(" Page is already allocated to a frame ");
-      return;
     } else
     {
         uint32_t index = find_free_frame();
-        if(index)
+        if(index == (uint32_t)-1)
         {
-          uint32_t frame_address = index * PAGE_SIZE;
-          set_frame_bit(frame_address, 1);
-          page->present = 1;
-          page->frame = index;
-        } else {
           print_error(" There are no free frames ");
         }
+        uint32_t frame_address = index * PAGE_SIZE;
+        set_frame_bit(frame_address, 1);
+        *page = (page_t) { .present = 1, .frame = index};
     }
 }
 

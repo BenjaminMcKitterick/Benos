@@ -7,18 +7,7 @@ uint8_t lessthan(form_t a, form_t b)
 {
    return a < b ? 1:0;
 }
-/*
-meta_table_t create_table(uint32_t max_size, order_t less_than)
-{
-    meta_table_t table;
-    table.pointer = (void*)alloc_memory(max_size*sizeof(form_t));
-    set_memory(table.pointer, 0, max_size*sizeof(form_t));
-    table.order = less_than;
-    table.max_size = max_size;
-    table.size = 0;
-    return table;
-}
-*/
+
 meta_table_t initialise_table(void *address, uint32_t max_size, order_t less_than)
 {
     meta_table_t table;
@@ -34,7 +23,6 @@ void insert(form_t block, meta_table_t *table)
 {
     for(int i = 0; table->size && table->order(table->pointer[i], block); i++)
     {
-         i++;
          if(i == (int)table->size)
          {
              // add item to the end

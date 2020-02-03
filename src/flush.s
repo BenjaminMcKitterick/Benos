@@ -1,3 +1,15 @@
+
+############################
+#	eax  Accumulator Register
+#	ebx  Base Register
+#	ecx  Counter Register
+#	edx  Data Register
+#	esi  Source Index
+#	edi  Destination Index
+#	ebp  Base Pointer
+#	esp  Stack Pointer
+###########################
+
 .global load_gdt
 .extern gdt_pointer
 
@@ -22,15 +34,13 @@ load_idt:
 	lidt (idt_pointer)			# load the new idt pointer
 	ret
 
-# need to set global tings and allow the external var to be parsed.
-# using 0x80000001 will set PG and PE bits in CR0 reg
+# using 0x80000001 will set PG and PE (protected) bits in CR0 reg
 
 .global enable_paging
-.extern dir_address
 enable_paging:
-		mov $dir_address, %eax
-		mov %eax, %cr3
+		push %ebp 								# base/frame pointer
 		mov %cr0, %eax
-		or $0x80000001, %eax
+		or $0x80000000, %eax
 		mov %eax, %cr0
+		pop %ebp
 		ret
