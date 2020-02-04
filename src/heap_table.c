@@ -12,6 +12,7 @@ meta_table_t initialise_table(void *address, uint32_t max_size, order_t less_tha
 {
     meta_table_t table;
     table.pointer = (form_t*)address;
+    println(" %h ", table.pointer);
     set_memory(table.pointer, 0, max_size*sizeof(form_t));
     table.order = less_than;
     table.max_size = max_size;

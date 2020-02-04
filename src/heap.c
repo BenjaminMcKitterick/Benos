@@ -60,18 +60,27 @@ heap_t *create_heap(uint32_t start, uint32_t end, uint32_t max)
 {
     heap_t *heap = (heap_t*)malloc_virt(sizeof(heap_t), 0);
     meta_table_t heap_table = initialise_table((void*)start, HEAP_INDEX_SIZE, &header_order);
-
+    //println("%h", heap_table);
+    heap->table = heap_table;
     start += sizeof(form_t)*HEAP_INDEX_SIZE;
 
-    heap->start_address = start;
-    heap->end_address = end;
-    heap->max_address = max;
+    println(" %h", start);
+    println(" %h", end);
+    println(" %h", max);
+
+    //heap->start_address = start;
+    //heap->end_address = end;
+    //heap->max_address = max;
+
+    println("test");
 
     // make first initial hole
     meta_header_t *init_hole = (meta_header_t *)start;
     init_hole->magic = HEAP_MAGIC;
     init_hole->size = end - start;
     init_hole->free = 1;
+
+    println("%h", &heap_table);
 
     insert((void*)init_hole, &heap_table);
 
@@ -117,6 +126,8 @@ void alter_heap_size(uint32_t new_size, heap_t *heap)
   if ((new_size & ALIGNMENT) != 0)
   {
     // TODO: new_size = page_align(new_size);
+      new_size &= ALIGNMENT;
+      new_size += PAGE_SIZE;
   }
 
   if( new_size > current_size )
