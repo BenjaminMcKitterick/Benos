@@ -5,13 +5,6 @@
 #include "heap_table.h"
 #include <stddef.h>
 
-uint32_t kmalloc_int(uint32_t sz, int align, uint32_t *phys);
-uint32_t kmalloc_a(uint32_t sz);
-uint32_t kmalloc_p(uint32_t sz, uint32_t *phys);
-uint32_t kmalloc_ap(uint32_t sz, uint32_t *phys);
-uint32_t kmalloc(uint32_t sz);
-
-
 #define HEAP_START          0xB0000000
 #define HEAP_INDEX_SIZE     0x20000
 #define HEAP_MAGIC          0x0DECAF
@@ -31,7 +24,7 @@ typedef struct
 typedef struct
 {
     uint32_t magic;           // for identification
-    meta_header_t *header;   // points to block header
+    meta_header_t *header;    // points to block header
 } meta_footer_t;
 
 typedef struct

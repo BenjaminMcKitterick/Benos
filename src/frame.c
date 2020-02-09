@@ -7,6 +7,7 @@
 #include "display.h"
 
 extern uint32_t p_address;
+extern uint32_t num_frames;
 
 static void set_frame_bit(uint32_t address, uint8_t bit)
 {
@@ -16,7 +17,7 @@ static void set_frame_bit(uint32_t address, uint8_t bit)
   if(bit){
     // OR is used to set the bit
     frames[i] |= (0x1 << offset);
-  }else
+  } else
   {
     // AND is used to unset the bit
     frames[i] &= ~(0x1 << offset);
@@ -25,8 +26,10 @@ static void set_frame_bit(uint32_t address, uint8_t bit)
 
 // finds the first free frame within a bitmap
 static uint32_t find_free_frame()
-{
-    for(int i = 0; i < (int)(NUM_FRAMES/BITMAP_SIZE); i++)
+{   /* num_frames var will have to be changed to be an extern va_arg
+       when heap becomes dynamic */
+    //uint32_t num_frames = PAGE_END_ADDRESS/PAGE_SIZE;
+    for(int i = 0; i < (int)(num_frames/BITMAP_SIZE); i++)
     {
       for(int j = 0; j < BITMAP_SIZE; j++)
       {
@@ -42,8 +45,9 @@ void allocate_frame(page_t *page)
 {
     if(page->frame)
     {
-      print_error(" Page is already allocated to a frame ");
-    } else
+        print_error(" Page is already allocated to a frame ");
+    }
+    else
     {
         uint32_t index = find_free_frame();
         if(index == (uint32_t)-1)

@@ -10,6 +10,7 @@
 #include <stdint.h>
 
 page_directory_t *directory=0;
+uint32_t num_frames;
 static void page_fault();
 extern uint32_t p_address;
 extern heap_t *heap;
@@ -17,16 +18,17 @@ extern heap_t *heap;
 void initialise_paging()
 {
     // Initialise memory for frames and directory
-    frames = (uint32_t*)malloc_virt((NUM_FRAMES/BITMAP_SIZE), 0);
+    num_frames = PAGE_END_ADDRESS/PAGE_SIZE;
+    frames = (uint32_t*)malloc_virt((num_frames/BITMAP_SIZE), 0);
     directory = (page_directory_t*)malloc_virt(sizeof(page_directory_t), 1);
-    set_memory(frames, 0, (NUM_FRAMES/BITMAP_SIZE));
+    set_memory(frames, 0, (num_frames/BITMAP_SIZE));
     set_memory(directory, 0, sizeof(page_directory_t));
 
     /* need to identity map pages to heap but not allowed to change
-       p_address between identity map and heap intiialisation */
+       p_address between identity map and heap intialisation */
 
     page_t *heap_page;
-    for (int i = HEAP_START; i < (int)HEAP_END; i += PAGE_SIZE)
+    for (int i = HEAP_START; i < HEAP_END; i += PAGE_SIZE)
     {
         heap_page = retrieve_page(i, directory);
     }
@@ -35,7 +37,7 @@ void initialise_paging()
     page_t *new_page;
 
     // Assign frames to pages
-    while ((uint32_t)i < p_address)
+    while (i < p_address+PAGE_SIZE)
     {
         new_page = retrieve_page(i, directory);
         allocate_frame(new_page);
@@ -43,10 +45,10 @@ void initialise_paging()
     }
 
     // allocate previously mapped pages
-    for (int i = HEAP_START; i < (int)HEAP_END; i += PAGE_SIZE)
+    for (int i = HEAP_START; i < HEAP_END; i += PAGE_SIZE)
     {
         heap_page = retrieve_page(i, directory);
-        allocate_frame(heap_page);
+        allocate_frame( retrieve_page(i, directory) );
     }
 
     // Register the page fault handler then load the directory
@@ -75,10 +77,10 @@ page_t *retrieve_page(uint32_t address, page_directory_t *directory)
     else
     {
         uint32_t temp_addr;
-        set_memory(page_table, 0, PAGE_SIZE);
         directory->entry[table_index] = (page_table_t*)malloc_phys(sizeof(page_table_t), 1, &temp_addr);
-        directory->physical_tables[table_index] = temp_addr | 0x3;
-        return &directory->entry[table_index]->pages[address%PAGE_SIZE];
+        set_memory( directory->entry[table_index], 0, PAGE_SIZE);
+        directory->physical_tables[table_index] = temp_addr | 0x5;
+        return &directory->entry[table_index]->pages[address%ENTRIES];
     }
 }
 
@@ -99,7 +101,7 @@ static void page_fault(struct reg_state reg)
     uint8_t i = fault & 0x10;
 
     uint32_t condition;
-    if (w | u) { condition = "failed:"; } else { condition = "passed"; }
+    if (w | u) { condition = "FAIL:"; } else { condition = "PASS"; }
     println("     Protection check: %s ", condition);
     if (w) { println("         - read/write");}
     if (u) { println("         - priviledge");}

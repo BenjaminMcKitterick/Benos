@@ -12,7 +12,6 @@ meta_table_t initialise_table(void *address, uint32_t max_size, order_t less_tha
 {
     meta_table_t table;
     table.pointer = (form_t*)address;
-    println(" %h ", table.pointer);
     set_memory(table.pointer, 0, max_size*sizeof(form_t));
     table.order = less_than;
     table.max_size = max_size;
@@ -20,7 +19,7 @@ meta_table_t initialise_table(void *address, uint32_t max_size, order_t less_tha
     return table;
 }
 
-void insert(form_t block, meta_table_t *table)
+void table_insert(form_t block, meta_table_t *table)
 {
     for(int i = 0; table->size && table->order(table->pointer[i], block); i++)
     {
@@ -46,7 +45,7 @@ void insert(form_t block, meta_table_t *table)
      }
 }
 
-form_t search(uint32_t n, meta_table_t *table)
+form_t table_search(uint32_t n, meta_table_t *table)
 {
     if( n < table->size)
     {
@@ -56,4 +55,15 @@ form_t search(uint32_t n, meta_table_t *table)
       println(" ERROR - NO HEAP DATA AT INDEX %d", n);
       return 0;
     }
+}
+
+// TODO: Change this later once its working
+void table_remove(uint32_t i, meta_table_t *table)
+{
+    while (i < table->size)
+    {
+        table->pointer[i] = table->pointer[i+1];
+        i++;
+    }
+    table->size--;
 }

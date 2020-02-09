@@ -5,6 +5,7 @@
 #include "heap_table.h"
 
 extern uint32_t end;
+extern page_directory_t *directory;
 uint32_t p_address = (uint32_t)&end;
 heap_t *heap=0;
 
@@ -25,6 +26,7 @@ uint32_t malloc_virt(size_t size, uint8_t align)
   if (heap != 0)
   {
       // TODO: allocate stuff here once heap is initialised
+
   }
   else
   {
@@ -43,6 +45,7 @@ uint32_t malloc_phys(size_t size, uint8_t align, uint32_t *physical)
   if (heap != 0)
   {
       // TODO: allocate stuff here once heap is initialised
+
   } else
   {
     if( align == 1 && (p_address & ALIGNMENT))
@@ -58,21 +61,15 @@ uint32_t malloc_phys(size_t size, uint8_t align, uint32_t *physical)
 
 heap_t *create_heap(uint32_t start, uint32_t end, uint32_t max)
 {
+
     heap_t *heap = (heap_t*)malloc_virt(sizeof(heap_t), 0);
     meta_table_t heap_table = initialise_table((void*)start, HEAP_INDEX_SIZE, &header_order);
-    //println("%h", heap_table);
     heap->table = heap_table;
     start += sizeof(form_t)*HEAP_INDEX_SIZE;
 
-    println(" %h", start);
-    println(" %h", end);
-    println(" %h", max);
-
-    //heap->start_address = start;
-    //heap->end_address = end;
-    //heap->max_address = max;
-
-    println("test");
+    heap->start_address = start;
+    heap->end_address = end;
+    heap->max_address = max;
 
     // make first initial hole
     meta_header_t *init_hole = (meta_header_t *)start;
@@ -80,9 +77,7 @@ heap_t *create_heap(uint32_t start, uint32_t end, uint32_t max)
     init_hole->size = end - start;
     init_hole->free = 1;
 
-    println("%h", &heap_table);
-
-    insert((void*)init_hole, &heap_table);
+    table_insert((void*)init_hole, &heap_table);
 
     return heap;
 }
@@ -93,7 +88,7 @@ uint32_t smallest_hole(uint32_t size, uint8_t page_aligned, heap_t *heap)
   int i;
   for(i = 0; i < (int)heap->table.size; i++)
   {
-    meta_header_t *header = (meta_header_t *)search(i, &heap->table);
+    meta_header_t *header = (meta_header_t *)table_search(i, &heap->table);
     if(page_aligned == 1)
     {
         // start of header needs to be page aligned.
@@ -125,7 +120,6 @@ void alter_heap_size(uint32_t new_size, heap_t *heap)
 
   if ((new_size & ALIGNMENT) != 0)
   {
-    // TODO: new_size = page_align(new_size);
       new_size &= ALIGNMENT;
       new_size += PAGE_SIZE;
   }
@@ -133,9 +127,13 @@ void alter_heap_size(uint32_t new_size, heap_t *heap)
   if( new_size > current_size )
   {
     // grow the heap
+    page_t *page;
     for(int i = current_size; i < (int)new_size; i += PAGE_SIZE)
     {
-      // TODO: allocate frame here
+        // Allocate frame here
+        page = retrieve_page(heap->start_address+i, directory);
+        allocate_frame(page);
+        i += PAGE_SIZE;
     }
   }
   else
@@ -144,9 +142,13 @@ void alter_heap_size(uint32_t new_size, heap_t *heap)
     if(new_size < HEAP_MIN)
       new_size = HEAP_MIN;
 
+    page_t *page;;
     for(int i = (current_size - PAGE_SIZE); (int)new_size < i; i -= PAGE_SIZE)
     {
-      // TODO: free frame here
+        // Free frame here
+        page = retrieve_page(heap->start_address+i, directory);
+        deallocate_frame(page);
+        i -= PAGE_SIZE;
     }
   }
     heap->end_address = heap->start_address + new_size;
