@@ -69,6 +69,8 @@ void clear_terminal()
     for(int i = 0; i < (int)(TERMINAL_WIDTH*TERMINAL_HEIGHT); i++){
         vga_buf[i] = 0x20 | 0 << 8;
     }
+		cursor_y = 0;
+		cursor_x = 0;
 }
 
 void scroll_terminal()

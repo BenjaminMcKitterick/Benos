@@ -2,13 +2,13 @@
 #ifndef PAGING_H
 #define PAGING_H
 
-#define ENTRIES 1024
+#include "utility.h"
+#include "interrupts.h"
 
-#include <stddef.h>
-#include <stdint.h>
-
-void enable_paging();
-void initialise_paging();
+#define ONE_K_BYTE  1024
+#define FOUR_K_BYTE 4096
+#define PAGE_SIZE   0x1000
+#define BITMAP_SIZE 32
 
 typedef struct page
 {
@@ -26,16 +26,17 @@ typedef struct page
 
 typedef struct page_table
 {
-    page_t pages[ENTRIES];
-} page_table_t __attribute__((aligned(4096)));
+    page_t pages[ONE_K_BYTE];
+} page_table_t __attribute__((aligned(FOUR_K_BYTE)));
 
 typedef struct page_directory
 {
-    page_table_t *entry[ENTRIES];
-    uint32_t physical_tables[ENTRIES];
-} page_directory_t __attribute__((aligned(4096)));
+    page_table_t *page_tables[ONE_K_BYTE];
+    uint32_t physical_tables[ONE_K_BYTE];
+} page_directory_t __attribute__((aligned(FOUR_K_BYTE)));
 
-page_t *retrieve_page(uint32_t address, page_directory_t *dir);
-void load_directory(page_directory_t *directory);
+void enable_paging();
+void initialise_paging();
+page_t *fetch_page(uint32_t address, page_directory_t *dir);
 
 #endif

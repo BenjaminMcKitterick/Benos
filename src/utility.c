@@ -33,6 +33,15 @@ void *set_memory(void *address, char data, size_t num_bytes)
 	return address;
 }
 
+void *memset(void *address, char data, size_t num_bytes)
+{
+	unsigned char* c = address;
+	for( int i = 0; (size_t) i < num_bytes; i++){
+		*c++ = (unsigned)data;
+	}
+	return address;
+}
+
 /*
 	 Simple funtion that returns the length of a string by counting
 	 the amount of characters.

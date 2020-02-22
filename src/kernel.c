@@ -27,12 +27,19 @@ void kernel_main(void)
 	pic_remap(0x20, 0x28);
 	asm volatile ("sti");
 
-	asm volatile ("int $0x8");
+	uint32_t a = malloc_virt(8,0);
+	uint32_t b = malloc_virt(8,0);
+	uint32_t c = malloc_virt(8,0);
 
-	// TEST PAGE FAULT
-	uint32_t *ptr = (uint32_t*)0xA0000000;
-  uint32_t do_page_fault = *ptr;
-	//println("%h", do_page_fault);
+	println("a %h", a);
+	println("b %h", b);
+	println("c %h", c);
+
+	// not sure if deallocate works...
+	deallocate(c);
+	deallocate(b);
+	uint32_t d = malloc_virt(12,0);
+	println("d %h", d);
 
 	while(true){
 		//move_entry(0,0);

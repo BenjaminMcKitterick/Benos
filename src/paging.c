@@ -2,44 +2,40 @@
 #include "paging.h"
 #include "heap.h"
 #include "display.h"
-#include "interrupts.h"
-#include "utility.h"
 #include "frame.h"
 
-#include <stddef.h>
-#include <stdint.h>
-
-page_directory_t *directory=0;
-uint32_t num_frames;
 static void page_fault();
-extern uint32_t p_address;
-extern heap_t *heap;
+extern uint32_t break_point_address;
+page_directory_t *kernel_directory=0;
+extern heap_t *kernel_heap;
+
+page_directory_t *new_directory()
+{
+    page_directory_t *directory = (page_directory_t*)malloc_virt(sizeof(page_directory_t),1);
+    set_memory(directory, 0, sizeof(page_directory_t));
+    return directory;
+}
 
 void initialise_paging()
 {
-    // Initialise memory for frames and directory
-    num_frames = PAGE_END_ADDRESS/PAGE_SIZE;
-    frames = (uint32_t*)malloc_virt((num_frames/BITMAP_SIZE), 0);
-    directory = (page_directory_t*)malloc_virt(sizeof(page_directory_t), 1);
-    set_memory(frames, 0, (num_frames/BITMAP_SIZE));
-    set_memory(directory, 0, sizeof(page_directory_t));
-
-    /* need to identity map pages to heap but not allowed to change
-       p_address between identity map and heap intialisation */
+    nframes = PAGE_END_ADDRESS / PAGE_SIZE;
+    frames = (uint32_t*)malloc_virt((nframes/BITMAP_SIZE), 1);
+    kernel_directory = new_directory();
+    set_memory(frames, 0, nframes/BITMAP_SIZE);
 
     page_t *heap_page;
     for (int i = HEAP_START; i < HEAP_END; i += PAGE_SIZE)
     {
-        heap_page = retrieve_page(i, directory);
+        heap_page = fetch_page(i, kernel_directory);
     }
 
     int i = 0;
     page_t *new_page;
 
     // Assign frames to pages
-    while (i < p_address+PAGE_SIZE)
+    while (i < break_point_address+PAGE_SIZE)
     {
-        new_page = retrieve_page(i, directory);
+        new_page = fetch_page(i, kernel_directory);
         allocate_frame(new_page);
         i += PAGE_SIZE;
     }
@@ -47,16 +43,16 @@ void initialise_paging()
     // allocate previously mapped pages
     for (int i = HEAP_START; i < HEAP_END; i += PAGE_SIZE)
     {
-        heap_page = retrieve_page(i, directory);
-        allocate_frame( retrieve_page(i, directory) );
+        heap_page = fetch_page(i, kernel_directory);
+        allocate_frame( fetch_page(i, kernel_directory) );
     }
 
-    // Register the page fault handler then load the directory
-    reg_int_handler(14, &page_fault);
-    load_directory(directory);
+    /* register the interrupt hander, load the directory and
+       initialise the kernel heap. */
 
-    // Create the heap
-    heap = create_heap(HEAP_START, HEAP_END, HEAP_MAX);
+    reg_int_handler(14, page_fault);
+    load_directory(kernel_directory);
+    kernel_heap = initialise_heap(HEAP_START, HEAP_START+HEAP_INITIAL_SIZE, HEAP_MAX);
 }
 
 void load_directory(page_directory_t *directory)
@@ -65,22 +61,23 @@ void load_directory(page_directory_t *directory)
     enable_paging();
 }
 
-page_t *retrieve_page(uint32_t address, page_directory_t *directory)
+page_t *fetch_page(uint32_t address, page_directory_t *directory)
 {
-    uint32_t table_index = (address/=PAGE_SIZE)/ENTRIES;
-    page_table_t *page_table = directory->entry[table_index];
-    if (directory->entry[table_index])
+    uint32_t table_index = (address/=PAGE_SIZE)/ONE_K_BYTE;
+    uint32_t pages_index = address%ONE_K_BYTE;
+    page_table_t *page_table = directory->page_tables[table_index];
+    if (directory->page_tables[table_index])
     {
-        // if already exists then return the page
-        return &page_table->pages[address%ENTRIES];
+        // If already exists then return the page
+        return &page_table->pages[pages_index];
     }
     else
     {
         uint32_t temp_addr;
-        directory->entry[table_index] = (page_table_t*)malloc_phys(sizeof(page_table_t), 1, &temp_addr);
-        set_memory( directory->entry[table_index], 0, PAGE_SIZE);
-        directory->physical_tables[table_index] = temp_addr | 0x5;
-        return &directory->entry[table_index]->pages[address%ENTRIES];
+        directory->page_tables[table_index] = (page_table_t*)malloc_phys(sizeof(page_table_t), 1, &temp_addr);
+        set_memory( directory->page_tables[table_index], 0, PAGE_SIZE);
+        directory->physical_tables[table_index] = temp_addr | 0x3;
+        return &directory->page_tables[table_index]->pages[pages_index];
     }
 }
 
@@ -89,7 +86,6 @@ static void page_fault(struct reg_state reg)
     uint32_t fault_address;
     asm volatile("mov %%cr2, %0" : "=r" (fault_address));
     println(" Interrupt: %h Page Fault Exception {", reg.int_num);
-    //println("     Error code %h", reg.error_code);
     println("     Error occured at: %h, code: %h", fault_address, reg.error_code);
 
     uint8_t fault = reg.error_code;
@@ -105,9 +101,9 @@ static void page_fault(struct reg_state reg)
     println("     Protection check: %s ", condition);
     if (w) { println("         - read/write");}
     if (u) { println("         - priviledge");}
-    if (!p) { println("     ERROR: A page directory or table entry is not present \
+    if (!p) { println("     ERROR: A page directory or table tables is not present \
                           in physical memory.");}
-    if (r) { println("     ERROR: A reserved bit in a page directory or table entry \
+    if (r) { println("     ERROR: A reserved bit in a page directory or table tables \
                           is set.");}
     if (i) { println("     ERROR: Attempt to load the instruction TLB with a translation \
                           for a non-executable page.");}

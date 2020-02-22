@@ -28,8 +28,7 @@ const char* exceptions[] = {
   "Stack Fault",
   "General Protection Fault",
   "Page Fault",
-  //"Unknown Interrupt",
-  "Fail for You!",
+  "Unknown Interrupt",
   "Coprocessor Fault",
   "Alignment Check",
   "Machine Check"
@@ -62,6 +61,11 @@ void isr_handler(struct reg_state r)
     println("Interrupt: %h, %s Exception", r.int_num, exceptions[r.int_num]);
   }
   update_keyboard();
+
+  if(r.int_num >= 40)
+		port_out(SLAVE_PIC, END_OF_INTERRUPT);
+
+	port_out(MASTER_PIC, END_OF_INTERRUPT);
 }
 /*
    Interrupt request handler. Creates a handler for the irq,

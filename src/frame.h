@@ -7,8 +7,8 @@
 #define PAGE_SIZE 0x1000
 
 uint32_t *frames;
+uint32_t nframes;
 void allocate_frame(page_t *page);
 void deallocate_frame(page_t *page);
-void alloc_frame(page_t *page, int is_kernel, int is_writeable);
 
 #endif
