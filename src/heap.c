@@ -129,9 +129,9 @@ static uint32_t get_smallest_chunk(uint32_t size, uint8_t aligned, heap_t *heap)
     return i;
 }
 
-static int header_order(void*header_one, void *header_two)
+static int header_order(void*header_one, void *meta_header_two)
 {
-    if (((meta_header_t*)header_one)->size < ((meta_header_t*)header_two)->size)
+    if (((meta_header_t*)header_one)->size < ((meta_header_t*)meta_header_two)->size)
         return 1;
     else
         return 0;
@@ -309,7 +309,7 @@ void deallocate(void *pointer)
         char add_chunk = 1;
         header->free = 1;
 
-        uint32_t footer_address = header + header->size -sizeof(meta_footer_t);
+        uint32_t footer_address = (uint32_t)header + header->size -sizeof(meta_footer_t);
         meta_footer_t *footer = (meta_footer_t*)footer_address;
 
         /* Check the magic value of the item to the left and if it is a footer
@@ -335,8 +335,10 @@ void deallocate(void *pointer)
             header->size += sanity_header->size;
             uint32_t new_footer_address = ((uint32_t)sanity_header + sanity_header->size - sizeof(meta_footer_t));
             footer = (meta_footer_t*)new_footer_address;
+
             remove_header(sanity_header);
         }
+
 
         /* Now see if the footer location is the end address */
         uint32_t footer_location = (uint32_t)footer+sizeof(meta_footer_t);

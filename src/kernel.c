@@ -35,7 +35,6 @@ void kernel_main(void)
 	println("b %h", b);
 	println("c %h", c);
 
-	// not sure if deallocate works...
 	deallocate(c);
 	deallocate(b);
 	uint32_t d = malloc_virt(12,0);

@@ -22,55 +22,27 @@ meta_table_t initialise_table(void *address, uint32_t max_size, order_t less_tha
     table.size = 0;
     return table;
 }
-// -------------------------------------------------------------
-// table insert has been edited and is an issue on BenOS main...
-// -------------------------------------------------------------
+
 void table_insert(unknown_t chunk, meta_table_t *table)
 {
-  /*
-  for(int i = 0; table->size && table->order(table->pointer[i], block); i++)
-  {
-       if(i == (int)table->size)
-       {
-           // add item to the end
-           table->pointer[table->size++] = block;
-       } else
-       {
-           // store temp val at index and new item in b_array
-           unknown_t temp = table->pointer[i];
-           table->pointer[i] = block;
-           // now shift everything along once
-           while( i < (int)table->size )
-           {
-             i++;
-             unknown_t temp2 = table->pointer[i];
-             table->pointer[i] = temp;
-             temp = temp2;
-           }
-           table->size++;
-       }
-   }
-   */
-
-    //for( int i = 0; i < )
-    uint32_t iterator = 0;
-    while (iterator < table->size && table->order(table->pointer[iterator], chunk))
-        iterator++;
-    if (iterator == table->size) // just add at the end of the array.
-        table->pointer[table->size++] = chunk;
-    else
+    uint32_t index;
+    for( index = 0; index < table->size && table->order(table->pointer[index], chunk); index++){
+      // do nothing... simply retrieving an index
+    }
+    if (index != table->size)
     {
-        unknown_t tmp = table->pointer[iterator];
-        table->pointer[iterator] = chunk;
-        while (iterator < table->size)
+        unknown_t temp_loc = table->pointer[index];
+        table->pointer[index] = chunk;
+        for(index; index < table->size; index++)
         {
-            iterator++;
-            unknown_t tmp2 = table->pointer[iterator];
-            table->pointer[iterator] = tmp;
-            tmp = tmp2;
+          unknown_t swap = table->pointer[index];
+          table->pointer[index] = temp_loc;
+          temp_loc = swap;
         }
         table->size++;
     }
+    else
+        table->pointer[table->size++] = chunk; // append to end
 }
 
 unknown_t table_search(uint32_t n, meta_table_t *table)
