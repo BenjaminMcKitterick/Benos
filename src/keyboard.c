@@ -8,6 +8,7 @@ static void keyboard_input();
 void key_enter();
 int entry_x = ENTRY_START;
 int entry_y;
+uint8_t first_key = 0;
 
 unsigned char keymap[128] =
 {
@@ -65,6 +66,10 @@ void update_keyboard(){
 
 static void keyboard_input()
 {
+    if(first_key == 0)
+    {
+        first_key = 1;
+    }
     unsigned char scancode = port_in(0x60);
     char clear = (0x20 | 0 << 8);
 

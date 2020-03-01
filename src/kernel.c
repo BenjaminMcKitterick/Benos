@@ -12,6 +12,35 @@
 #include "pit.h"
 #include "heap.h"
 
+extern uint8_t first_key;
+
+static void start_menu()
+{
+	for(int i = 0; i < TERMINAL_WIDTH; i++)
+			print(" ", DARK_GREY, DARK_GREY);
+
+	for(int i = 0; i < TERMINAL_WIDTH; i++)
+			print("|", GREEN, BLACK);
+
+	move_entry(TERMINAL_WIDTH/3.25, (TERMINAL_HEIGHT/3)-2);
+	print("_____________________________", GREEN, BLACK);
+	move_entry(TERMINAL_WIDTH/3.25, TERMINAL_HEIGHT/3);
+	print("BenOS an x86 Operating System", GREEN, BLACK);
+	move_entry(TERMINAL_WIDTH/3.25, (TERMINAL_HEIGHT/3)+1);
+	print("_____________________________", GREEN, BLACK);
+
+	move_entry(TERMINAL_WIDTH/3, TERMINAL_HEIGHT/1.5);
+	print("Enter any key to continue", LIGHT_GREY, BLACK);
+
+	move_entry(0, TERMINAL_HEIGHT-2);
+
+	for(int i = 0; i < TERMINAL_WIDTH; i++)
+			print("|", GREEN, BLACK);
+
+	for(int i = 0; i < TERMINAL_WIDTH; i++)
+			print(" ", DARK_GREY, DARK_GREY);
+}
+
 void kernel_main(void)
 {
 	intitialise_tables();
@@ -26,6 +55,26 @@ void kernel_main(void)
 
 	pic_remap(0x20, 0x28);
 	asm volatile ("sti");
+
+	while(1){
+			if(first_key == 1)
+			{
+					clear_terminal();
+					move_entry(0,0);
+					for(int i = 0; i < (TERMINAL_WIDTH/2)-6; i++)
+				  		print(" ", DARK_GREY, DARK_GREY);
+					print("BenOS Terminal", WHITE, DARK_GREY); // print smiley face after
+					for(int i = 0; i < (TERMINAL_WIDTH/2)-8; i++)
+				  		print(" ", DARK_GREY, DARK_GREY);
+					key_enter();
+					move_entry(0,3);
+					break;
+			}
+			else
+			{
+				start_menu();
+			}
+	}
 
 	uint32_t a = malloc_virt(8,0);
 	uint32_t b = malloc_virt(8,0);

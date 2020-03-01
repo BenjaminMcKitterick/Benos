@@ -8,6 +8,7 @@
 #define ONE_K_BYTE  1024
 #define FOUR_K_BYTE 4096
 #define PAGE_SIZE   0x1000
+#define DIR_FLAGS   0x5
 #define BITMAP_SIZE 32
 
 typedef struct page
@@ -33,6 +34,7 @@ typedef struct page_directory
 {
     page_table_t *page_tables[ONE_K_BYTE];
     uint32_t physical_tables[ONE_K_BYTE];
+    uint32_t physical_address;
 } page_directory_t __attribute__((aligned(FOUR_K_BYTE)));
 
 void enable_paging();
