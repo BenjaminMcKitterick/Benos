@@ -27,7 +27,8 @@
 #define IRQ15 47
 
 struct reg_state
-{	unsigned int ds;
+{	
+	unsigned int ds;
 	unsigned int edi, esi, ebp, esp, ebx, edx, ecx, eax;
 	unsigned int int_num, error_code;
 	unsigned int eip, cs, eflags, useresp, ss;
