@@ -194,6 +194,10 @@ heap_t *initialise_heap(uint32_t start, uint32_t end_addr, uint32_t max, uint8_t
     return heap;
 }
 
+void k_deallocate(void *pointer){
+    deallocate(pointer, kernel_heap);
+}
+
 void *allocate(uint32_t size, uint8_t align, heap_t *heap)
 {
     /* Here we get the size we need to allocate, taking into account the
@@ -302,7 +306,7 @@ static uint32_t remove_header(meta_header_t *header){
     table_delete(index, &kernel_heap->table);
 }
 
-void deallocate(void *pointer)
+void deallocate(void *pointer, heap_t *heap)
 {
     if( pointer != 0){
 
@@ -345,11 +349,11 @@ void deallocate(void *pointer)
 
         /* Now see if the footer location is the end address */
         uint32_t footer_location = (uint32_t)footer+sizeof(meta_footer_t);
-        if(footer_location == kernel_heap->end_address)
+        if(footer_location == heap->end_address)
         {
-            uint32_t old_length = kernel_heap->end_address-kernel_heap->start_address;
-            alter_heap_size((uint32_t)header - kernel_heap->start_address, kernel_heap);
-            uint32_t new_length = (kernel_heap->end_address - kernel_heap->start_address);
+            uint32_t old_length = heap->end_address-heap->start_address;
+            alter_heap_size((uint32_t)header - heap->start_address, heap);
+            uint32_t new_length = (heap->end_address - heap->start_address);
             uint32_t difference = (old_length - new_length);
 
             /* Now after resizing we check to see if the we need to remove the sanity header
@@ -368,7 +372,7 @@ void deallocate(void *pointer)
         }
 
         if (add_chunk == 1)
-            table_insert((void*)header, &kernel_heap->table);
+            table_insert((void*)header, &heap->table);
     }
     else
       return;

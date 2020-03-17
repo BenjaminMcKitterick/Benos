@@ -41,6 +41,7 @@ typedef struct
 
 heap_t *initialise_heap(uint32_t start, uint32_t end, uint32_t max, uint8_t role, uint8_t read);
 void *allocate(uint32_t size, uint8_t align, heap_t *heap);
-void deallocate(void *pointer);
+void k_deallocate(void *pointer);
+void deallocate(void *pointer, heap_t *heap);
 
 #endif //

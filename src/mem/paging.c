@@ -62,13 +62,18 @@ void initialise_paging()
 
     reg_int_handler(14, page_fault);
     load_directory(kernel_directory);
+    enable_paging();
     kernel_heap = initialise_heap(HEAP_START, HEAP_START+HEAP_INITIAL_SIZE, HEAP_MAX, 0, 0);
 }
 
 void load_directory(page_directory_t *directory)
 {
     asm volatile("mov %0, %%cr3":: "r"(directory->physical_address));
-    enable_paging();
+}
+
+void switch_directory(void* cr3)
+{
+    asm volatile("mov %0, %%cr3":: "r"(cr3));
 }
 
 page_t *fetch_page(uint32_t address, uint8_t make, page_directory_t *directory)
@@ -115,9 +120,9 @@ static void page_fault(struct reg_state reg)
     println("     Protection check: %s ", condition);
     if (w) { println("         - read/write");}
     if (u) { println("         - priviledge");}
-    if (!p) { println("     ERROR: A page directory or table tables is not present \
+    if (!p) { println("     ERROR: A page directory or table is not present \
                           in physical memory.");}
-    if (r) { println("     ERROR: A reserved bit in a page directory or table tables \
+    if (r) { println("     ERROR: A reserved bit in a page directory or table \
                           is set.");}
     if (i) { println("     ERROR: Attempt to load the instruction TLB with a translation \
                           for a non-executable page.");}

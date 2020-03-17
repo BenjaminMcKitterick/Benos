@@ -124,7 +124,7 @@ void check_command(){
   char* str = "clear";
   if(*string_input == *str){
       reset_terminal();
-      memset(string_input, 0, sizeof(string_input));
+      set_memory(string_input, 0, sizeof(string_input));
   }
   else
   {

@@ -33,13 +33,14 @@ void *set_memory(void *address, char data, size_t num_bytes)
 	return address;
 }
 
-void *memset(void *address, char data, size_t num_bytes)
+// being used for testing - remove later
+void copy_memory(void *dst, void *src, size_t len)
 {
-	unsigned char* c = address;
-	for( int i = 0; (size_t) i < num_bytes; i++){
-		*c++ = (unsigned)data;
-	}
-	return address;
+	char *d = dst;
+	char *s = src;
+	while(len--)
+		*d++ = *s++;
+	return dst;
 }
 
 /*

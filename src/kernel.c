@@ -64,25 +64,11 @@ void kernel_main(void)
 			}
 			else
 			{
-				start_menu();
+					start_menu();
 			}
 	}
-
-	//__asm__ volatile("int $0x08");
-	do_something();
-
-	//uint32_t a = malloc_virt(8,0);
-	//uint32_t b = malloc_virt(8,0);
-	//uint32_t c = malloc_virt(8,0);
-
-	//println("a %h", a);
-	//println("b %h", b);
-	//println("c %h", c);
-
-	//deallocate(c);
-	//deallocate(b);
-	//uint32_t d = malloc_virt(12,0);
-	//println("d %h", d);
+	
+	initialise_scheduler();
 
 	while(true){
 		//move_entry(0,0);

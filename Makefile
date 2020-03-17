@@ -50,7 +50,6 @@ all:
 		$$TARGET-gcc -I $(INC_DIR) -c $(MEM_DIR)/heap_table.c -o $(OUT_DIR)/heap_table.o $(CFLAGS)
 		$$TARGET-gcc -I $(INC_DIR) -c $(MEM_DIR)/frame.c -o $(OUT_DIR)/frame.o $(CFLAGS)
 
-		$$TARGET-gcc -I $(INC_DIR) -c $(SCH_DIR)/context_switch.s -o $(OUT_DIR)/context_switch.o $(CFLAGS)
 		$$TARGET-gcc -I $(INC_DIR) -c $(SCH_DIR)/scheduler.c -o $(OUT_DIR)/scheduler.o $(CFLAGS)
 		$$TARGET-gcc -I $(INC_DIR) -c $(SCH_DIR)/thread.c -o $(OUT_DIR)/thread.o $(CFLAGS)
 
@@ -60,7 +59,7 @@ all:
 			$(OUT_DIR)/utility.o $(OUT_DIR)/isr.o $(OUT_DIR)/interrupts.o $(OUT_DIR)/pic.o \
 			$(OUT_DIR)/pit.o $(OUT_DIR)/keyboard.o $(OUT_DIR)/paging.o $(OUT_DIR)/heap.o \
             $(OUT_DIR)/frame.o $(OUT_DIR)/heap_table.o $(OUT_DIR)/scheduler.o \
-			$(OUT_DIR)/context_switch.o $(OUT_DIR)/thread.o -lgcc
+			$(OUT_DIR)/thread.o -lgcc
 
 		# Build the bootable image
 		mkdir -p dir/boot/grub

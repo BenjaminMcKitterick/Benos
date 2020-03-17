@@ -2,13 +2,16 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <interrupts.h>
+#include <scheduler.h>
 #include <utility.h>
 #include <display.h>
 #include <pit.h>
 
 static void timer();
+extern uint32_t scheduling;
 uint8_t ticks;
-uint8_t seconds;
+uint8_t seconds = 0;
+uint16_t hz = 0;
 
 // Setting a default frequency of 100hz. Can be altered later on...
 void install_timer()
@@ -17,16 +20,16 @@ void install_timer()
   set_frequency(100);
 }
 
-static void timer()
+static void timer(struct reg_state r)
 {
   ticks++;
-  if(ticks % 100 == 0){
+  if(ticks % TIME_SLICE == 0){
+    if(scheduling == 1)
+      switch_tasks(r);
     seconds++;
   }
-  //move_entry(20,20);
-  //clear_terminal();
-  //print(base_conversion(ticks, 10), GREEN, BLACK);
 }
+
 /*
    The divisor is calculated and then split into the MSB
    and LSB. We then send the command byte to the command
@@ -35,6 +38,7 @@ static void timer()
 */
 void set_frequency(uint8_t freq){
 
+  hz = freq;
   uint32_t divisor = TICK_RATE / freq;
   uint8_t div_low = (uint8_t)(divisor & 0xFF);
   uint8_t div_high = (uint8_t)((divisor >> 8) & 0xFF);
@@ -48,18 +52,9 @@ uint8_t get_time(){ return ticks; }
 
 void timer_wait(int tick_amount)
 {
-    //uint32_t t_end = ticks + t;
-    unsigned int t_start;
-
-    t_start = seconds + tick_amount;
-    //println("%d",eticks);
-
+    uint32_t t_end = ticks + tick_amount * hz;
     // event queue on timer interrupt
 
     // deadlock from there
-    while(seconds < t_start);
-  //  {
-      //print(base_conversion(seconds, 10), MAGENTA, BLACK);
-      //print(base_conversion(eticks, 10), MAGENTA, BLACK);
-  //  }
+    while(seconds < t_end);
 }

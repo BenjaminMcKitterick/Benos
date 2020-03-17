@@ -16,7 +16,7 @@ typedef struct thread {
     uint32_t      time_running;
     task_t        *task;
 
-    context_t     *context;
+    //context_t     *context;
 
 } thread_t;
 

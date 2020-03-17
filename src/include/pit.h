@@ -6,6 +6,7 @@
 #define COMMAND_BYTE 0x36
 #define CHANNEL0 0x40
 #define TICK_RATE 1193180
+#define TIME_SLICE 200
 
 void install_timer();
 void set_frequency(uint8_t freq);

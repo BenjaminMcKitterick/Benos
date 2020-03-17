@@ -39,6 +39,7 @@ typedef struct page_directory
 
 void enable_paging();
 void initialise_paging();
+void switch_directory(void* cr3);
 page_t *fetch_page(uint32_t address, uint8_t make, page_directory_t *dir);
 
 #endif
